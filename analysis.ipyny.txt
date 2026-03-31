@@ -1,0 +1,128 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv("ecommerce_sales.csv")
+
+# Convert order_date to datetime
+df["order_date"] = pd.to_datetime(df["order_date"])
+
+# Create Revenue column
+df["Revenue"] = df["quantity"] * df["price"] - df["discount"]
+
+
+ BASIC DATA OVERVIEW
+
+
+total_orders = df["order_id"].nunique()
+total_revenue = df["Revenue"].sum()
+avg_order_value = df["Revenue"].mean()
+
+print("Total Orders:", total_orders)
+print("Total Revenue:", total_revenue)
+print("Average Order Value:", round(avg_order_value,2))
+
+
+ TOP PRODUCTS
+
+
+top_products = (
+    df.groupby("product_name")["quantity"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nTop Selling Products")
+print(top_products.head())
+
+
+ REVENUE BY CATEGORY
+
+revenue_category = (
+    df.groupby("category")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nRevenue by Category")
+print(revenue_category)
+
+
+ TOP CITIES BY REVENUE
+
+
+top_cities = (
+    df.groupby("city")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nTop Cities by Revenue")
+print(top_cities.head())
+
+
+PAYMENT METHOD ANALYSIS
+
+
+payment_usage = df["payment_method"].value_counts()
+
+print("\nPayment Method Usage")
+print(payment_usage)
+
+
+ MONTHLY SALES TREND
+
+
+df["month"] = df["order_date"].dt.month
+
+monthly_sales = df.groupby("month")["Revenue"].sum()
+
+print("\nMonthly Revenue")
+print(monthly_sales)
+
+
+ TOP CUSTOMERS
+
+
+top_customers = (
+    df.groupby("customer_name")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nTop Customers")
+print(top_customers.head())
+
+ 
+ VISUALIZATION
+ 
+
+revenue_category.plot(kind="bar")
+
+plt.title("Revenue by Category")
+plt.xlabel("Category")
+plt.ylabel("Revenue")
+
+plt.tight_layout()
+plt.show()
+
+
+ Monthly Growth Rate
+
+# convert date
+df["order_date"] = pd.to_datetime(df["order_date"])
+
+# create month column
+df["month"] = df["order_date"].dt.month
+
+# monthly revenue
+monthly_sales = df.groupby("month")["Revenue"].sum()
+
+print("Monthly Revenue")
+print(monthly_sales)
+
+# growth rate
+growth_rate = monthly_sales.pct_change() * 100
+
+print("\nMonthly Growth Rate (%)")
+print(growth_rate)
